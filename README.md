@@ -39,4 +39,45 @@ POST `/api/manifestacoes`: Registra uma nova manifestação (recebe multipart/fo
 GET `/api/manifestacoes/{protocolo}`: Consulta o status e detalhes de uma manifestação.
 
 ---
+## 📱 Frontend (PWA)
+
+O frontend foi desenvolvido como um **Progressive Web App (PWA)** utilizando **React**, **Vite** e **Tailwind CSS**. A aplicação é totalmente responsiva e acessível, com suporte a Alto Contraste e Leitura de Tela.
+
+### Como Executar (Recomendado via Maven)
+
+O projeto está configurado para baixar e configurar o Node.js automaticamente através do Maven (frontend-maven-plugin).
+
+1. Navegue até a pasta `frontend`:
+   ```bash
+   cd frontend
+   ```
+2. Instale as dependências e o Node.js local:
+    ```bash
+    mvn generate-resources
+    # Em seguida instale as deps JS
+    ./target/node/node ./target/node/node_modules/npm/bin/npm-cli.js install
+    ```
+3. Execute o servidor de desenvolvimento:
+    ```bash
+    ./target/node/node ./target/node/node_modules/npm/bin/npm-cli.js run dev
+    ```
+
+### Como Executar (Com Node.js instalado)
+
+Se você já possui Node.js (v20+) instalado:
+
+1. Instale as dependências:
+   ```bash
+   cd frontend
+   npm install
+   ```
+2. Execute o servidor:
+   ```bash
+   npm run dev
+   ```
+3. Acesse em: `http://localhost:5173`
+
+> **Nota:** Certifique-se de que o backend está rodando na porta 8080.
+
+---
 Desenvolvido para o Hackathon Participa DF 2026
