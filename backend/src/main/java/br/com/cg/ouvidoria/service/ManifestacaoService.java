@@ -27,22 +27,22 @@ public class ManifestacaoService {
         return repository.findByProtocolo(protocolo);
     }
 
-
+    /**
+     * Salva a manifestação junto com os arquivos de mídia (áudio, imagem, vídeo).
+     * Cada arquivo é persistido no disco e sua URL é armazenada na entidade.
+     */
     public Manifestacao salvarManifestacaoComArquivos(Manifestacao m, MultipartFile audio, MultipartFile imagem, MultipartFile video) {
-        // 1. Gera o protocolo
         m.setProtocolo(gerarProtocolo());
 
-        // 2. Salva os arquivos e guarda o caminho/URL na entidade
         if (audio != null && !audio.isEmpty()) m.setAnexoAudioUrl(fileService.salvar(audio));
         if (imagem != null && !imagem.isEmpty()) m.setAnexoImagemUrl(fileService.salvar(imagem));
         if (video != null && !video.isEmpty()) m.setAnexoVideoUrl(fileService.salvar(video));
 
-        // 3. Salva no H2
         return repository.save(m);
     }
 
+    /** Gera protocolo no formato PROT-AAAA + 6 dígitos aleatórios */
     private String gerarProtocolo() {
         return "PROT-" + LocalDate.now().getYear() + String.format("%06d", new Random().nextInt(999999));
     }
-
 }

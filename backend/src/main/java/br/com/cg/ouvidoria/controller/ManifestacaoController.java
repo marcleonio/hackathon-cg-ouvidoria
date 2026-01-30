@@ -20,11 +20,15 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/manifestacoes")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*") // Libera para o front do seu amigo acessar sem erro de CORS
+@CrossOrigin(origins = "*")
 public class ManifestacaoController {
 
     private final ManifestacaoService service;
 
+    /**
+     * Registra uma nova manifestação com suporte a multicanais (texto, áudio, imagem, vídeo).
+     * O protocolo é gerado automaticamente e retornado na resposta.
+     */
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Manifestacao> criar(
         @RequestParam("descricao") String descricao,
@@ -41,13 +45,11 @@ public class ManifestacaoController {
         m.setTipo(tipo);
         m.setAnonimo(anonimo);
 
-        // Regra de anonimato
         if (!anonimo) {
             m.setNomeCidadao(nome);
             m.setEmailCidadao(email);
         }
 
-        // Chama o service que vai cuidar de salvar arquivos e persistir no banco
         return ResponseEntity.ok(service.salvarManifestacaoComArquivos(m, audio, imagem, video));
     }
 

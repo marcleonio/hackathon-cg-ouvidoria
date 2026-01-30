@@ -1,32 +1,74 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@import "./theme.css";
 
 @layer base {
   body {
     @apply antialiased bg-gray-50 text-gray-900 transition-colors duration-300;
   }
 
-  /* High Contrast Mode Global Overrides */
-  .high-contrast body {
-    @apply bg-black text-yellow-300;
-  }
-  
-  .high-contrast {
-    background-color: #000000 !important;
-    color: #ffff00 !important;
+  /* Controle de tamanho de fonte via classe no html */
+  .font-normal { font-size: 100%; }
+  .font-large { font-size: 120%; }
+  .font-extra-large { font-size: 140%; }
+
+  /* Focus visible global - acessibilidade de teclado (WCAG 2.4.7) */
+  :focus-visible {
+    outline: 3px solid #005CA9;
+    outline-offset: 2px;
   }
 
+  /* Respeita preferência de movimento reduzido */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  /* ===== Modo alto contraste (WCAG AAA — preto/amarelo) ===== */
+  .high-contrast,
   .high-contrast * {
+    color: #ffff00 !important;
+    background-color: #000000 !important;
     border-color: #ffff00 !important;
-    /* text-decoration: underline; Optional for links but maybe too much globally */
   }
-  
-  .high-contrast button, .high-contrast a, .high-contrast input, .high-contrast select, .high-contrast textarea {
-    @apply bg-black text-yellow-300 border-2 border-yellow-300;
+
+  .high-contrast a,
+  .high-contrast button,
+  .high-contrast input,
+  .high-contrast select,
+  .high-contrast textarea {
+    border: 2px solid #ffff00 !important;
   }
-  
-  .high-contrast img, .high-contrast video {
-    filter: grayscale(100%) contrast(150%);
+
+  .high-contrast a:hover,
+  .high-contrast button:hover {
+    background-color: #ffff00 !important;
+    color: #000000 !important;
+  }
+
+  .high-contrast button:disabled {
+    opacity: 0.5;
+  }
+
+  .high-contrast :focus-visible {
+    outline: 3px solid #ffff00 !important;
+    outline-offset: 2px;
+  }
+
+  .high-contrast img,
+  .high-contrast video {
+    filter: none;
+    background-color: transparent !important;
+  }
+
+  .high-contrast audio {
+    background-color: transparent !important;
+  }
+
+  /* Placeholder legível */
+  .high-contrast input::placeholder,
+  .high-contrast textarea::placeholder {
+    color: #999900 !important;
   }
 }
