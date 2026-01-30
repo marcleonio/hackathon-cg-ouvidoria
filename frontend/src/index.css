@@ -1,3 +1,4 @@
+@import "tailwindcss";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -11,7 +12,7 @@
   .high-contrast body {
     @apply bg-black text-yellow-300;
   }
-  
+
   .high-contrast {
     background-color: #000000 !important;
     color: #ffff00 !important;
@@ -21,11 +22,11 @@
     border-color: #ffff00 !important;
     /* text-decoration: underline; Optional for links but maybe too much globally */
   }
-  
+
   .high-contrast button, .high-contrast a, .high-contrast input, .high-contrast select, .high-contrast textarea {
     @apply bg-black text-yellow-300 border-2 border-yellow-300;
   }
-  
+
   .high-contrast img, .high-contrast video {
     filter: grayscale(100%) contrast(150%);
   }
