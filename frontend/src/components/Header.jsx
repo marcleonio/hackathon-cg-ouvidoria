@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAccessibility } from '../context/AccessibilityContext';
-import { Eye, Megaphone, Plus, Minus } from 'lucide-react';
+import { Eye, Megaphone, Plus, Minus, BarChart3 } from 'lucide-react';
 
 export default function Header() {
   const {
@@ -93,6 +93,13 @@ export default function Header() {
               className="text-sm font-medium px-3 py-2 rounded hover:bg-gov-dark transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-300"
             >
               Consultar Protocolo
+            </a>
+            <a
+              href="/dashboard"
+              className="text-sm font-medium px-3 py-2 rounded hover:bg-gov-dark transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-300 flex items-center gap-1"
+            >
+              <BarChart3 size={14} aria-hidden="true" />
+              Dashboard
             </a>
           </nav>
         </div>

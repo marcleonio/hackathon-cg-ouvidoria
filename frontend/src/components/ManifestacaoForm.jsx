@@ -91,7 +91,7 @@ export default function ManifestacaoForm() {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 
-      setSuccess(response.data.protocolo);
+      setSuccess({ protocolo: response.data.protocolo, senha: response.data.senha });
       setFormData({ descricao: '', tipo: 'RECLAMACAO', anonimo: false, nome: '', email: '' });
       setAudioBlob(null);
       setImagem(null);
@@ -105,26 +105,33 @@ export default function ManifestacaoForm() {
     }
   };
 
-  // Tela de sucesso com protocolo
+  // Tela de sucesso com protocolo e senha
   if (success) {
     return (
       <div className="max-w-2xl mx-auto p-8 bg-white rounded-xl shadow-lg border border-green-200 text-center" role="status">
         <CheckCircle size={64} className="text-green-500 mx-auto mb-4" aria-hidden="true" />
-        <h3 className="text-2xl font-bold text-gray-800 mb-2">Manifestação Registrada!</h3>
-        <p className="text-gray-600 mb-6">Sua manifestação foi recebida com sucesso.</p>
-        <div className="bg-gray-50 rounded-lg p-4 mb-6 border border-gray-200">
+        <h3 className="text-2xl font-bold text-gray-800 mb-2">Manifestacao Registrada!</h3>
+        <p className="text-gray-600 mb-6">Sua manifestacao foi recebida com sucesso.</p>
+        <div className="bg-gray-50 rounded-lg p-4 mb-4 border border-gray-200">
           <p className="text-sm text-gray-500 mb-1">Seu protocolo de acompanhamento:</p>
-          <p className="text-2xl font-mono font-bold text-gov-blue tracking-wider">{success}</p>
+          <p className="text-2xl font-mono font-bold text-gov-blue tracking-wider">{success.protocolo}</p>
+        </div>
+        <div className="bg-yellow-50 rounded-lg p-4 mb-6 border border-yellow-300">
+          <p className="text-sm text-yellow-800 font-semibold mb-1">Sua senha de acesso:</p>
+          <p className="text-3xl font-mono font-bold text-yellow-900 tracking-[0.3em]">{success.senha}</p>
+          <p className="text-xs text-yellow-700 mt-2">
+            Anote esta senha! Ela sera necessaria para consultar sua manifestacao.
+          </p>
         </div>
         <p className="text-sm text-gray-500 mb-6">
-          Guarde este número para acompanhar o status da sua manifestação.
+          Guarde o protocolo e a senha para acompanhar o status da sua manifestacao.
         </p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <button
             onClick={() => setSuccess(null)}
             className="bg-gov-blue text-white font-bold py-3 px-6 rounded-lg hover:bg-gov-dark transition-colors focus:ring-4 focus:ring-blue-300"
           >
-            Nova Manifestação
+            Nova Manifestacao
           </button>
           <a
             href="/consulta"

@@ -4,6 +4,7 @@ import { AccessibilityProvider } from './context/AccessibilityContext';
 import Header from './components/Header';
 import ManifestacaoForm from './components/ManifestacaoForm';
 import ConsultaProtocolo from './components/ConsultaProtocolo';
+import Dashboard from './components/Dashboard';
 
 function HomePage() {
   return (
@@ -26,10 +27,24 @@ function ConsultaPage() {
       <section className="text-center mb-10">
         <h2 className="text-3xl font-bold text-gov-dark mb-3">Consulta de Protocolo</h2>
         <p className="text-gray-600 max-w-2xl mx-auto text-lg leading-relaxed">
-          Acompanhe o status da sua manifestação informando o número do protocolo.
+          Acompanhe o status da sua manifestacao informando o protocolo e a senha.
         </p>
       </section>
       <ConsultaProtocolo />
+    </>
+  );
+}
+
+function DashboardPage() {
+  return (
+    <>
+      <section className="text-center mb-10">
+        <h2 className="text-3xl font-bold text-gov-dark mb-3">Painel de Gestao</h2>
+        <p className="text-gray-600 max-w-2xl mx-auto text-lg leading-relaxed">
+          Acompanhe indicadores e metricas das manifestacoes da Ouvidoria.
+        </p>
+      </section>
+      <Dashboard />
     </>
   );
 }
@@ -45,6 +60,7 @@ function App() {
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/consulta" element={<ConsultaPage />} />
+              <Route path="/dashboard" element={<DashboardPage />} />
             </Routes>
           </main>
 
