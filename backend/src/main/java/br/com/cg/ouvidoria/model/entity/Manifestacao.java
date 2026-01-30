@@ -2,6 +2,7 @@ package br.com.cg.ouvidoria.model.entity;
 
 import java.time.LocalDateTime;
 
+import br.com.cg.ouvidoria.constants.ProtocoloStatusEnum;
 import br.com.cg.ouvidoria.constants.TipoManifestacaoEnum;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -22,6 +23,10 @@ public class Manifestacao {
 
     @Column(unique = true, nullable = false)
     private String protocolo;
+    private String senha;
+    @Enumerated(EnumType.STRING)
+    private ProtocoloStatusEnum status;
+    private String prioridade;
 
     @Enumerated(EnumType.STRING)
     private TipoManifestacaoEnum tipo; // RECLAMACAO, DENUNCIA, SUGESTAO, ELOGIO
