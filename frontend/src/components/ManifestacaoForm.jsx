@@ -35,6 +35,7 @@ export default function ManifestacaoForm() {
   const [audioBlob, setAudioBlob] = useState(null);
   const [imagem, setImagem] = useState(null);
   const [video, setVideo] = useState(null);
+  const [maxStepReached, setMaxStepReached] = useState(0);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -44,9 +45,13 @@ export default function ManifestacaoForm() {
     }));
   };
 
+  const temConteudo = () => {
+    return formData.descricao.trim().length > 0 || audioBlob || imagem || video;
+  };
+
   const canAdvanceStep = () => {
     if (currentStep === 0) {
-      return formData.tipo && formData.descricao.trim().length > 0;
+      return !!formData.tipo;
     }
     if (currentStep === 1) {
       if (formData.anonimo) return true;
@@ -59,22 +64,31 @@ export default function ManifestacaoForm() {
 
   const advanceStep = () => {
     if (canAdvanceStep()) {
-      setCurrentStep(prev => prev + 1);
+      const next = currentStep + 1;
+      setCurrentStep(next);
+      setMaxStepReached(prev => Math.max(prev, next));
       setStepChangedAt(Date.now());
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Evita submit acidental se o step acabou de mudar (double-click)
     if (Date.now() - stepChangedAt < 300) return;
+
+    if (!temConteudo()) {
+      setError('Envie pelo menos um conteudo: texto, audio, imagem ou video.');
+      return;
+    }
+
     setLoading(true);
     setError(null);
     setSuccess(null);
 
     try {
       const data = new FormData();
-      data.append('descricao', formData.descricao);
+      if (formData.descricao.trim()) {
+        data.append('descricao', formData.descricao);
+      }
       data.append('tipo', formData.tipo);
       data.append('anonimo', formData.anonimo);
 
@@ -97,9 +111,11 @@ export default function ManifestacaoForm() {
       setImagem(null);
       setVideo(null);
       setCurrentStep(0);
+      setMaxStepReached(0);
     } catch (err) {
       console.error(err);
-      setError('Ocorreu um erro ao enviar sua manifestação. Tente novamente.');
+      const msg = err.response?.data?.erro || 'Ocorreu um erro ao enviar sua manifestacao. Tente novamente.';
+      setError(msg);
     } finally {
       setLoading(false);
     }
@@ -158,7 +174,7 @@ export default function ManifestacaoForm() {
               key={step.label}
               type="button"
               onClick={() => {
-                if (idx < currentStep || canAdvanceStep()) setCurrentStep(idx);
+                if (idx <= maxStepReached) setCurrentStep(idx);
               }}
               className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-gov-blue ${
                 isActive
@@ -180,11 +196,11 @@ export default function ManifestacaoForm() {
       {/* Etapa 1 - Tipo e Descrição */}
       {currentStep === 0 && (
         <fieldset className="space-y-4">
-          <legend className="text-lg font-semibold text-gray-800 mb-2">Tipo e Descrição</legend>
+          <legend className="text-lg font-semibold text-gray-800 mb-2">Tipo e Descricao</legend>
 
           <div>
             <label htmlFor="tipo" className="block text-sm font-medium text-gray-700 mb-1">
-              Tipo de Manifestação <span className="text-red-500" aria-hidden="true">*</span>
+              Tipo de Manifestacao <span className="text-red-500" aria-hidden="true">*</span>
             </label>
             <select
               id="tipo"
@@ -202,7 +218,7 @@ export default function ManifestacaoForm() {
 
           <div>
             <label htmlFor="descricao" className="block text-sm font-medium text-gray-700 mb-1">
-              Descrição <span className="text-red-500" aria-hidden="true">*</span>
+              Descricao
             </label>
             <textarea
               id="descricao"
@@ -210,13 +226,12 @@ export default function ManifestacaoForm() {
               rows={5}
               value={formData.descricao}
               onChange={handleChange}
-              required
-              placeholder="Descreva detalhadamente sua manifestação..."
+              placeholder="Descreva sua manifestacao ou pule para enviar por audio/video..."
               className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gov-blue focus:border-transparent resize-y"
               aria-describedby="descricao-hint"
             />
-            <p id="descricao-hint" className="text-xs text-gray-500 mt-1">
-              {formData.descricao.length}/2000 caracteres
+            <p id="descricao-hint" className="text-xs text-gray-600 mt-1">
+              Opcional — voce pode descrever por texto ou enviar audio, imagem ou video na proxima etapa. {formData.descricao.length}/2000
             </p>
           </div>
         </fieldset>
@@ -287,10 +302,17 @@ export default function ManifestacaoForm() {
       {/* Etapa 3 - Anexos */}
       {currentStep === 2 && (
         <fieldset className="space-y-4">
-          <legend className="text-lg font-semibold text-gray-800 mb-2">Anexos (Opcional)</legend>
-          <p className="text-sm text-gray-500">
-            Anexe arquivos para complementar sua manifestação. Áudio, imagem e vídeo são aceitos.
+          <legend className="text-lg font-semibold text-gray-800 mb-2">Anexos</legend>
+          <p className="text-sm text-gray-600">
+            {formData.descricao.trim()
+              ? 'Complemente sua manifestacao com audio, imagem ou video.'
+              : 'Envie pelo menos um arquivo: grave um audio, tire uma foto ou envie um video.'}
           </p>
+          {!formData.descricao.trim() && !audioBlob && !imagem && !video && (
+            <div className="p-3 bg-yellow-50 border border-yellow-300 rounded-lg text-sm text-yellow-800" role="alert">
+              Como voce nao preencheu a descricao por texto, envie pelo menos um audio, imagem ou video.
+            </div>
+          )}
 
           <AudioRecorder key={success ? 'reset-audio' : 'audio'} onRecordingComplete={setAudioBlob} />
 

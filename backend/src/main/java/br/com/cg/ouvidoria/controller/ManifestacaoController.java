@@ -28,8 +28,8 @@ public class ManifestacaoController {
                description = "Cria uma manifestação com suporte a arquivos de áudio, vídeo e imagem para acessibilidade.")
     @ApiResponse(responseCode = "200", description = "Manifestação criada com sucesso")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Manifestacao> criar(
-        @RequestParam("descricao") String descricao,
+    public ResponseEntity<?> criar(
+        @RequestParam(value = "descricao", required = false) String descricao,
         @RequestParam("tipo") TipoManifestacaoEnum tipo,
         @RequestParam("anonimo") boolean anonimo,
         @RequestParam(value = "nome", required = false) String nome,
@@ -38,8 +38,19 @@ public class ManifestacaoController {
         @RequestParam(value = "imagem", required = false) MultipartFile imagem,
         @RequestParam(value = "video", required = false) MultipartFile video) {
 
+        boolean temDescricao = descricao != null && !descricao.isBlank();
+        boolean temAudio = audio != null && !audio.isEmpty();
+        boolean temImagem = imagem != null && !imagem.isEmpty();
+        boolean temVideo = video != null && !video.isEmpty();
+
+        if (!temDescricao && !temAudio && !temImagem && !temVideo) {
+            return ResponseEntity.badRequest().body(
+                Map.of("erro", "Envie pelo menos um conteudo: texto, audio, imagem ou video.")
+            );
+        }
+
         Manifestacao m = new Manifestacao();
-        m.setDescricao(descricao);
+        m.setDescricao(temDescricao ? descricao : null);
         m.setTipo(tipo);
         m.setAnonimo(anonimo);
 

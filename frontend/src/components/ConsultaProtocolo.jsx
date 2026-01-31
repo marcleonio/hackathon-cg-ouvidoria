@@ -120,7 +120,7 @@ export default function ConsultaProtocolo() {
               className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gov-blue focus:border-transparent font-mono"
               aria-describedby="protocolo-hint"
             />
-            <p id="protocolo-hint" className="text-xs text-gray-400 mt-1">
+            <p id="protocolo-hint" className="text-xs text-gray-600 mt-1">
               Formato: PROT-AAAA000000
             </p>
           </div>
@@ -144,7 +144,7 @@ export default function ConsultaProtocolo() {
                 aria-describedby="senha-hint"
               />
             </div>
-            <p id="senha-hint" className="text-xs text-gray-400 mt-1">
+            <p id="senha-hint" className="text-xs text-gray-600 mt-1">
               Senha de 4 digitos recebida ao registrar a manifestacao
             </p>
           </div>
@@ -170,7 +170,7 @@ export default function ConsultaProtocolo() {
 
       {/* Resultado */}
       {dados && (
-        <div className="p-6 bg-white rounded-xl shadow-lg border border-gray-100" role="region" aria-label="Detalhes da manifestacao">
+        <div className="p-6 bg-white rounded-xl shadow-lg border border-gray-100" role="region" aria-label="Detalhes da manifestacao" aria-live="polite">
           {/* Cabecalho com protocolo e status */}
           <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-200">
             <div className="flex items-center gap-3">
@@ -203,7 +203,7 @@ export default function ConsultaProtocolo() {
                       className={`h-2 w-full rounded-full transition-colors ${isActive ? 'bg-gov-blue' : 'bg-gray-200'}`}
                       aria-hidden="true"
                     />
-                    <span className={`text-[10px] ${isActive ? 'text-gov-blue font-semibold' : 'text-gray-400'}`}>
+                    <span className={`text-[10px] ${isActive ? 'text-gov-blue font-semibold' : 'text-gray-500'}`}>
                       {config.label}
                     </span>
                   </div>
@@ -228,10 +228,17 @@ export default function ConsultaProtocolo() {
           </button>
 
           <dl className="space-y-3">
-            <div>
-              <dt className="text-xs font-medium text-gray-500 uppercase">Descricao</dt>
-              <dd className="mt-1 text-gray-700 bg-gray-50 p-3 rounded-lg">{dados.descricao}</dd>
-            </div>
+            {dados.descricao && (
+              <div>
+                <dt className="text-xs font-medium text-gray-500 uppercase">Descricao</dt>
+                <dd className="mt-1 text-gray-700 bg-gray-50 p-3 rounded-lg">{dados.descricao}</dd>
+              </div>
+            )}
+            {!dados.descricao && (
+              <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-700">
+                Manifestacao registrada por midia (audio, imagem ou video).
+              </div>
+            )}
 
             <div className="grid grid-cols-2 gap-3">
               <div>

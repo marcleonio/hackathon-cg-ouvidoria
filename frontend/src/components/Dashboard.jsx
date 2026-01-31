@@ -168,7 +168,7 @@ export default function Dashboard() {
               </div>
             ))}
             {(!dashData?.distribuicaoStatus || dashData.distribuicaoStatus.length === 0) && (
-              <p className="text-gray-400 text-sm text-center py-4">Nenhum dado disponivel</p>
+              <p className="text-gray-600 text-sm text-center py-4">Nenhum dado disponivel</p>
             )}
           </div>
         </div>
@@ -199,7 +199,7 @@ export default function Dashboard() {
               </div>
             ))}
             {(!dashData?.distribuicaoTipo || dashData.distribuicaoTipo.length === 0) && (
-              <p className="text-gray-400 text-sm text-center py-4">Nenhum dado disponivel</p>
+              <p className="text-gray-600 text-sm text-center py-4">Nenhum dado disponivel</p>
             )}
           </div>
         </div>
