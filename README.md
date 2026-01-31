@@ -269,6 +269,13 @@ A solucao foi construida com as **tecnologias mais recentes do mercado** (React 
 
 ---
 
+## 📺 Pitch da Solução
+
+[![Assista ao Vídeo do Pitch](https://img.youtube.com/vi/4QX7GZRb05Q/0.jpg)](https://www.youtube.com/watch?v=4QX7GZRb05Q)
+
+
+---
+
 ## Uso de Inteligencia Artificial
 
 Conforme item 13.9 do edital, declaramos o uso de IA no desenvolvimento:
