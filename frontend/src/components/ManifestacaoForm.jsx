@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Send, Loader2, CheckCircle, AlertCircle, FileText, User, Paperclip } from 'lucide-react';
+import { Send, Loader2, CheckCircle, AlertCircle, FileText, User, Paperclip, Copy, Check } from 'lucide-react';
 import api from '../services/api';
 import AudioRecorder from './AudioRecorder';
 import MediaUpload from './MediaUpload';
@@ -35,6 +35,7 @@ export default function ManifestacaoForm() {
   const [audioBlob, setAudioBlob] = useState(null);
   const [imagem, setImagem] = useState(null);
   const [video, setVideo] = useState(null);
+  const [maxStepReached, setMaxStepReached] = useState(0);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -44,9 +45,13 @@ export default function ManifestacaoForm() {
     }));
   };
 
+  const temConteudo = () => {
+    return formData.descricao.trim().length > 0 || audioBlob || imagem || video;
+  };
+
   const canAdvanceStep = () => {
     if (currentStep === 0) {
-      return formData.tipo && formData.descricao.trim().length > 0;
+      return !!formData.tipo;
     }
     if (currentStep === 1) {
       if (formData.anonimo) return true;
@@ -59,22 +64,31 @@ export default function ManifestacaoForm() {
 
   const advanceStep = () => {
     if (canAdvanceStep()) {
-      setCurrentStep(prev => prev + 1);
+      const next = currentStep + 1;
+      setCurrentStep(next);
+      setMaxStepReached(prev => Math.max(prev, next));
       setStepChangedAt(Date.now());
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Evita submit acidental se o step acabou de mudar (double-click)
     if (Date.now() - stepChangedAt < 300) return;
+
+    if (!temConteudo()) {
+      setError('Envie pelo menos um conteudo: texto, audio, imagem ou video.');
+      return;
+    }
+
     setLoading(true);
     setError(null);
     setSuccess(null);
 
     try {
       const data = new FormData();
-      data.append('descricao', formData.descricao);
+      if (formData.descricao.trim()) {
+        data.append('descricao', formData.descricao);
+      }
       data.append('tipo', formData.tipo);
       data.append('anonimo', formData.anonimo);
 
@@ -97,11 +111,33 @@ export default function ManifestacaoForm() {
       setImagem(null);
       setVideo(null);
       setCurrentStep(0);
+      setMaxStepReached(0);
     } catch (err) {
       console.error(err);
-      setError('Ocorreu um erro ao enviar sua manifestação. Tente novamente.');
+      const msg = err.response?.data?.erro || 'Ocorreu um erro ao enviar sua manifestacao. Tente novamente.';
+      setError(msg);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const [copiado, setCopiado] = useState(null);
+
+  const copiar = async (texto, campo) => {
+    try {
+      await navigator.clipboard.writeText(texto);
+      setCopiado(campo);
+      setTimeout(() => setCopiado(null), 2000);
+    } catch {
+      // fallback
+      const el = document.createElement('textarea');
+      el.value = texto;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand('copy');
+      document.body.removeChild(el);
+      setCopiado(campo);
+      setTimeout(() => setCopiado(null), 2000);
     }
   };
 
@@ -112,23 +148,54 @@ export default function ManifestacaoForm() {
         <CheckCircle size={64} className="text-green-500 mx-auto mb-4" aria-hidden="true" />
         <h3 className="text-2xl font-bold text-gray-800 mb-2">Manifestacao Registrada!</h3>
         <p className="text-gray-600 mb-6">Sua manifestacao foi recebida com sucesso.</p>
+
         <div className="bg-gray-50 rounded-lg p-4 mb-4 border border-gray-200">
-          <p className="text-sm text-gray-500 mb-1">Seu protocolo de acompanhamento:</p>
-          <p className="text-2xl font-mono font-bold text-gov-blue tracking-wider">{success.protocolo}</p>
+          <p className="text-sm text-gray-600 mb-2">Seu protocolo de acompanhamento:</p>
+          <p className="text-2xl font-mono font-bold text-gov-blue tracking-wider mb-2">{success.protocolo}</p>
+          <button
+            type="button"
+            onClick={() => copiar(success.protocolo, 'protocolo')}
+            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium bg-gov-blue text-white rounded-lg hover:bg-gov-dark transition-colors focus:ring-4 focus:ring-blue-300"
+            aria-label="Copiar numero do protocolo"
+          >
+            {copiado === 'protocolo' ? <Check size={16} /> : <Copy size={16} />}
+            {copiado === 'protocolo' ? 'Copiado!' : 'Copiar Protocolo'}
+          </button>
         </div>
-        <div className="bg-yellow-50 rounded-lg p-4 mb-6 border border-yellow-300">
-          <p className="text-sm text-yellow-800 font-semibold mb-1">Sua senha de acesso:</p>
-          <p className="text-3xl font-mono font-bold text-yellow-900 tracking-[0.3em]">{success.senha}</p>
-          <p className="text-xs text-yellow-700 mt-2">
+
+        <div className="bg-yellow-50 rounded-lg p-4 mb-4 border border-yellow-300">
+          <p className="text-sm text-yellow-800 font-semibold mb-2">Sua senha de acesso:</p>
+          <p className="text-3xl font-mono font-bold text-yellow-900 tracking-[0.3em] mb-2">{success.senha}</p>
+          <button
+            type="button"
+            onClick={() => copiar(success.senha, 'senha')}
+            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium bg-yellow-700 text-white rounded-lg hover:bg-yellow-800 transition-colors focus:ring-4 focus:ring-yellow-400"
+            aria-label="Copiar senha de acesso"
+          >
+            {copiado === 'senha' ? <Check size={16} /> : <Copy size={16} />}
+            {copiado === 'senha' ? 'Copiada!' : 'Copiar Senha'}
+          </button>
+          <p className="text-xs text-yellow-700 mt-3">
             Anote esta senha! Ela sera necessaria para consultar sua manifestacao.
           </p>
         </div>
-        <p className="text-sm text-gray-500 mb-6">
+
+        <button
+          type="button"
+          onClick={() => copiar(`Protocolo: ${success.protocolo}\nSenha: ${success.senha}`, 'ambos')}
+          className="w-full mb-6 py-2 px-4 text-sm font-medium bg-gray-100 text-gray-700 rounded-lg border border-gray-300 hover:bg-gray-200 transition-colors focus:ring-4 focus:ring-blue-300 inline-flex items-center justify-center gap-2"
+          aria-label="Copiar protocolo e senha juntos"
+        >
+          {copiado === 'ambos' ? <Check size={16} /> : <Copy size={16} />}
+          {copiado === 'ambos' ? 'Copiados!' : 'Copiar Protocolo e Senha'}
+        </button>
+
+        <p className="text-sm text-gray-600 mb-6">
           Guarde o protocolo e a senha para acompanhar o status da sua manifestacao.
         </p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <button
-            onClick={() => setSuccess(null)}
+            onClick={() => { setSuccess(null); setCopiado(null); }}
             className="bg-gov-blue text-white font-bold py-3 px-6 rounded-lg hover:bg-gov-dark transition-colors focus:ring-4 focus:ring-blue-300"
           >
             Nova Manifestacao
@@ -158,7 +225,7 @@ export default function ManifestacaoForm() {
               key={step.label}
               type="button"
               onClick={() => {
-                if (idx < currentStep || canAdvanceStep()) setCurrentStep(idx);
+                if (idx <= maxStepReached) setCurrentStep(idx);
               }}
               className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-gov-blue ${
                 isActive
@@ -180,11 +247,11 @@ export default function ManifestacaoForm() {
       {/* Etapa 1 - Tipo e Descrição */}
       {currentStep === 0 && (
         <fieldset className="space-y-4">
-          <legend className="text-lg font-semibold text-gray-800 mb-2">Tipo e Descrição</legend>
+          <legend className="text-lg font-semibold text-gray-800 mb-2">Tipo e Descricao</legend>
 
           <div>
             <label htmlFor="tipo" className="block text-sm font-medium text-gray-700 mb-1">
-              Tipo de Manifestação <span className="text-red-500" aria-hidden="true">*</span>
+              Tipo de Manifestacao <span className="text-red-500" aria-hidden="true">*</span>
             </label>
             <select
               id="tipo"
@@ -202,7 +269,7 @@ export default function ManifestacaoForm() {
 
           <div>
             <label htmlFor="descricao" className="block text-sm font-medium text-gray-700 mb-1">
-              Descrição <span className="text-red-500" aria-hidden="true">*</span>
+              Descricao
             </label>
             <textarea
               id="descricao"
@@ -210,13 +277,12 @@ export default function ManifestacaoForm() {
               rows={5}
               value={formData.descricao}
               onChange={handleChange}
-              required
-              placeholder="Descreva detalhadamente sua manifestação..."
+              placeholder="Descreva sua manifestacao ou pule para enviar por audio/video..."
               className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gov-blue focus:border-transparent resize-y"
               aria-describedby="descricao-hint"
             />
-            <p id="descricao-hint" className="text-xs text-gray-500 mt-1">
-              {formData.descricao.length}/2000 caracteres
+            <p id="descricao-hint" className="text-xs text-gray-600 mt-1">
+              Opcional — voce pode descrever por texto ou enviar audio, imagem ou video na proxima etapa. {formData.descricao.length}/2000
             </p>
           </div>
         </fieldset>
@@ -242,8 +308,23 @@ export default function ManifestacaoForm() {
           </div>
 
           {formData.anonimo && (
-            <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-sm text-yellow-800" role="note">
-              Sua manifestação será registrada de forma anônima. Você não será identificado.
+            <div className="p-4 bg-yellow-50 border border-yellow-300 rounded-lg text-sm text-yellow-900 space-y-3" role="note">
+              <p className="font-semibold">Identidade Preservada</p>
+              <p>
+                Sua identidade sera preservada neste pedido, em atendimento ao principio constitucional
+                da impessoalidade e conforme o disposto no art. 11, par. 7 da Lei Distrital n. 6.519/2020.
+              </p>
+              <p>
+                Somente a Controladoria-Geral do Distrito Federal tera acesso aos seus dados pessoais,
+                ressalvadas as excecoes previstas nos paragrafos 3 e 4 do art. 33 da Lei Distrital n. 4.990/2012.
+              </p>
+              <p>
+                O orgao destinatario nao podera solicitar esclarecimentos adicionais nem atender a pedidos
+                de informacao pessoal, uma vez que nao tera como confirmar sua identidade.
+              </p>
+              <p className="text-xs text-yellow-700 italic">
+                Base legal: Art. 14 da Instrucao Normativa CGDF n. 01 de 05/05/2017
+              </p>
             </div>
           )}
 
@@ -287,10 +368,17 @@ export default function ManifestacaoForm() {
       {/* Etapa 3 - Anexos */}
       {currentStep === 2 && (
         <fieldset className="space-y-4">
-          <legend className="text-lg font-semibold text-gray-800 mb-2">Anexos (Opcional)</legend>
-          <p className="text-sm text-gray-500">
-            Anexe arquivos para complementar sua manifestação. Áudio, imagem e vídeo são aceitos.
+          <legend className="text-lg font-semibold text-gray-800 mb-2">Anexos</legend>
+          <p className="text-sm text-gray-600">
+            {formData.descricao.trim()
+              ? 'Complemente sua manifestacao com audio, imagem ou video.'
+              : 'Envie pelo menos um arquivo: grave um audio, tire uma foto ou envie um video.'}
           </p>
+          {!formData.descricao.trim() && !audioBlob && !imagem && !video && (
+            <div className="p-3 bg-yellow-50 border border-yellow-300 rounded-lg text-sm text-yellow-800" role="alert">
+              Como voce nao preencheu a descricao por texto, envie pelo menos um audio, imagem ou video.
+            </div>
+          )}
 
           <AudioRecorder key={success ? 'reset-audio' : 'audio'} onRecordingComplete={setAudioBlob} />
 

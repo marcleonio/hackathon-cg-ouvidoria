@@ -38,7 +38,7 @@ export default function MediaUpload({ onMediaSelect, type = 'image', label }) {
                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                 aria-label={`Upload de ${label}`}
             />
-            <div className="flex flex-col items-center text-gray-400">
+            <div className="flex flex-col items-center text-gray-600">
                 {type === 'image' ? <Image size={32} /> : <Video size={32} />}
                 <span className="mt-2 text-sm">Toque para adicionar {type === 'image' ? 'foto' : 'vídeo'}</span>
             </div>

@@ -5,6 +5,7 @@ import Header from './components/Header';
 import ManifestacaoForm from './components/ManifestacaoForm';
 import ConsultaProtocolo from './components/ConsultaProtocolo';
 import Dashboard from './components/Dashboard';
+import Orientacoes from './components/Orientacoes';
 
 function HomePage() {
   return (
@@ -49,6 +50,20 @@ function DashboardPage() {
   );
 }
 
+function OrientacoesPage() {
+  return (
+    <>
+      <section className="text-center mb-10">
+        <h2 className="text-3xl font-bold text-gov-dark mb-3">Orientacoes</h2>
+        <p className="text-gray-600 max-w-2xl mx-auto text-lg leading-relaxed">
+          Saiba como funciona a Ouvidoria e como registrar sua manifestacao.
+        </p>
+      </section>
+      <Orientacoes />
+    </>
+  );
+}
+
 function App() {
   return (
     <AccessibilityProvider>
@@ -61,6 +76,7 @@ function App() {
               <Route path="/" element={<HomePage />} />
               <Route path="/consulta" element={<ConsultaPage />} />
               <Route path="/dashboard" element={<DashboardPage />} />
+              <Route path="/orientacoes" element={<OrientacoesPage />} />
             </Routes>
           </main>
 

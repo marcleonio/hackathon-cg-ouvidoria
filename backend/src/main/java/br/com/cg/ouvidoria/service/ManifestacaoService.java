@@ -63,10 +63,14 @@ public class ManifestacaoService {
     }
 
     public String gerarResumoAcessivel(Manifestacao m) {
-        // Agora o resumo usa o status real da manifestação
+        String canal = m.getDescricao() != null && !m.getDescricao().isBlank()
+            ? "por texto"
+            : m.getAnexoAudioUrl() != null ? "por audio" : "por midia";
+
         return String.format(
-            "Olá! Sua manifestação do tipo %s, de protocolo %s, registrada em %s, está com o status atual: %s.",
+            "Ola! Sua manifestacao do tipo %s, registrada %s, de protocolo %s, em %s, esta com o status atual: %s.",
             m.getTipo().toString().toLowerCase(),
+            canal,
             m.getProtocolo(),
             m.getDataCriacao().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
             m.getStatus()
